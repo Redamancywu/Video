@@ -1,0 +1,34 @@
+plugins {
+    id 'java-library'
+    id 'org.jetbrains.kotlin.jvm'
+    id 'com.gradle.plugin-publish'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+dependencies {
+
+    implementation gradleApi()
+    implementation androidxLibs.bundles.nav.plugin
+    implementation project(':nav-plugin-runtime')
+    //implementation 'com.techme.jetpack:nav-plugin-runtime:1.0.0'
+}
+
+version = "1.0.3"
+group = "io.github.mrme2014"
+gradlePlugin {
+    website = 'https://github.com/mrme2014'
+    vcsUrl = 'https://github.com/mrme2014/nav-plugin/blob/main/README.md'
+    plugins {
+        create('navPlugin') {
+            id = 'io.github.mrme2014.nav-plugin'
+            displayName = 'nav-plugin'
+            implementationClass = 'com.techme.jetpack.plugin.NavPlugin'
+            description = 'android jetpack navigation gradle'
+            tags.set(['navigation', 'transform', 'gradle7'])
+        }
+    }
+}
