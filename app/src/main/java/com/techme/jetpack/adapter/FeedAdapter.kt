@@ -42,7 +42,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class FeedAdapter(private val pageName:String,private val lifecycleOwner: LifecycleOwner) :
+class FeedAdapter(private val pageName: String, private val lifecycleOwner: LifecycleOwner) :
     PagingDataAdapter<Feed, FeedAdapter.FeedViewHolder>(object : DiffUtil.ItemCallback<Feed>() {
         override fun areItemsTheSame(oldItem: Feed, newItem: Feed): Boolean {
             // 判断两个Feed的id是否相同
@@ -59,8 +59,8 @@ class FeedAdapter(private val pageName:String,private val lifecycleOwner: Lifecy
 
     private lateinit var playDetector: PagePlayDetector
 
-    inner class FeedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) ,
-        PagePlayDetector.IPlayDetector{
+    inner class FeedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+        PagePlayDetector.IPlayDetector {
         private val authorBinding =
             LayoutFeedAuthorBinding.bind(itemView.findViewById(R.id.feed_author))
         private val feedTextBinding =
@@ -72,7 +72,7 @@ class FeedAdapter(private val pageName:String,private val lifecycleOwner: Lifecy
             LayoutFeedTopCommentBinding.bind(itemView.findViewById(R.id.feed_comment))
         private val interactionBinding =
             LayoutFeedInteractionBinding.bind(itemView.findViewById(R.id.feed_interaction))
-        private val wrapperPlayView=
+        private val wrapperPlayView =
             itemView.findViewById<WrapperPlayer>(R.id.feed_video)
 
         fun bindAuthor(author: Author?) {
@@ -216,27 +216,34 @@ class FeedAdapter(private val pageName:String,private val lifecycleOwner: Lifecy
             url?.run {
                 wrapperPlayView?.run {
                     setVisibility(true)
-                    bindData(width,height,cover,url, maxHeight)
+                    bindData(width, height, cover, url, maxHeight)
+                    setListener(object : WrapperPlayer.Listener {
+                        override fun onTogglePlay(attachView: WrapperPlayer) {
+                            playDetector.togglePlay(attachView, url)
+                        }
+
+                    })
                 }
             }
         }
 
         override fun getAttachView(): WrapperPlayer {
-           return wrapperPlayView
+            return wrapperPlayView
         }
 
         override fun getVideoUrl(): String {
-           return getItem(layoutPosition)?.url!!
+            return getItem(layoutPosition)?.url!!
         }
-        fun isVideo():Boolean{
-            return getItem(layoutPosition)?.itemType== TYPE_VIDEO
+
+        fun isVideo(): Boolean {
+            return getItem(layoutPosition)?.itemType == TYPE_VIDEO
         }
 
     }
 
     override fun onViewAttachedToWindow(holder: FeedViewHolder) {
         super.onViewAttachedToWindow(holder)
-        if (holder.isVideo()){
+        if (holder.isVideo()) {
             playDetector.addDetectorListener(holder)
         }
 
@@ -249,7 +256,7 @@ class FeedAdapter(private val pageName:String,private val lifecycleOwner: Lifecy
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-         playDetector= PagePlayDetector(pageName,lifecycleOwner,recyclerView)
+        playDetector = PagePlayDetector(pageName, lifecycleOwner, recyclerView)
     }
 
 
@@ -258,11 +265,11 @@ class FeedAdapter(private val pageName:String,private val lifecycleOwner: Lifecy
         holder.itemView.findViewById<TextView>(R.id.feed_text).text = feed.feedsText
         holder.bindAuthor(feed.author)
         holder.bindFeedContent(feed.feedsText)
-       // holder.bindFeedImage(feed.width, feed.height, PixUtil.dp2px(300), feed.cover)
-        if (feed.itemType!= TYPE_VIDEO){
+        // holder.bindFeedImage(feed.width, feed.height, PixUtil.dp2px(300), feed.cover)
+        if (feed.itemType != TYPE_VIDEO) {
             holder.bindFeedImage(feed.width, feed.height, PixUtil.dp2px(300), feed.cover)
-        }else{
-            holder.bindFeedVideo(feed.width, feed.height, PixUtil.dp2px(300), feed.cover,feed.url)
+        } else {
+            holder.bindFeedVideo(feed.width, feed.height, PixUtil.dp2px(300), feed.cover, feed.url)
         }
         holder.bindFeedLabel(feed.activityText)
         holder.bindFeedComment(feed.topComment)
@@ -278,7 +285,7 @@ class FeedAdapter(private val pageName:String,private val lifecycleOwner: Lifecy
             return FeedViewHolder(view)
         }
         val layout =
-            if (viewType == TYPE_IMAGE_TEXT) R.layout.layout_feed_type_image else R.layout.layout_feed_type_video
+            if (viewType == TYPE_IMAGE_TEXT || viewType == TYPE_TEXT) R.layout.layout_feed_type_image else R.layout.layout_feed_type_video
         return FeedViewHolder(LayoutInflater.from(parent.context).inflate(layout, parent, false))
     }
 

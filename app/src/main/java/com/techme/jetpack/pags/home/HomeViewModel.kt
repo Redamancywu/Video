@@ -11,19 +11,29 @@ import androidx.paging.cachedIn
 import com.techme.jetpack.http.ApiResult
 import com.techme.jetpack.http.ApiService
 
-class HomeViewModel:ViewModel() {
-    val hotFeeds=Pager(config = PagingConfig(pageSize = 10, initialLoadSize = 10,enablePlaceholders = false), pagingSourceFactory={
-        HomePageSource()
-    }).flow.cachedIn(viewModelScope)
+class HomeViewModel : ViewModel() {
+    val hotFeeds = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            initialLoadSize = 10,
+            enablePlaceholders = false
+        ), pagingSourceFactory = {
+            HomePageSource()
+        }).flow.cachedIn(viewModelScope)
+    private var feedType: String = "all"
+    fun setFeedType(feedType: String) {
+        this.feedType = feedType
+    }
+
     //实现pagingSource数据源  第一个参数是类型 第二个参数是数据 Feed
-    inner class HomePageSource:PagingSource<Long,Feed>(){
+    inner class HomePageSource : PagingSource<Long, Feed>() {
         override fun getRefreshKey(state: PagingState<Long, Feed>): Long? {
             //第一次加载的时候拿到分页参数
             return null
         }
 
         override suspend fun load(params: LoadParams<Long>): LoadResult<Long, Feed> {
-            val result= kotlin.runCatching {
+            val result = kotlin.runCatching {
                 /**
                  * 这段代码是Kotlin语言编写的，用于从某个服务（ApiService）获取数据。具体来说，它执行以下操作：
                  *
@@ -35,18 +45,23 @@ class HomeViewModel:ViewModel() {
                  *
                  * 总之，这段代码的作用是从某个服务（ApiService）获取数据，并在发生错误时进行处理。
                  */
-                ApiService.getService().getFeeds(feedId = params.key?:0L)  //0L是为第一页数据也就是初始数据
+                ApiService.getService()
+                    .getFeeds(feedId = params.key ?: 0L, feedType = feedType)  //0L是为第一页数据也就是初始数据
             }
-            val apiResult=result.getOrDefault(ApiResult())
-            if (apiResult.success&&apiResult.body?.isNotEmpty()==true){
-                return LoadResult.Page(apiResult.body!!,null,apiResult.body!!.last().id)
+            val apiResult = result.getOrDefault(ApiResult())
+            if (apiResult.success && apiResult.body?.isNotEmpty() == true) {
+                return LoadResult.Page(apiResult.body!!, null, apiResult.body!!.last().id)
                 //page里面三个参数
                 //第一个参数是加载的数据
                 //第二个参数prevKey向上加载
                 //第三个参数是nextKey向下加载
             }
             //当加载初始数据失败的时候
-          return if (params.key==null) LoadResult.Page(arrayListOf(),null,0) else LoadResult.Error(RuntimeException("加载失败"))
+            return if (params.key == null) LoadResult.Page(
+                arrayListOf(),
+                null,
+                0
+            ) else LoadResult.Error(RuntimeException("加载失败"))
 
         }
 

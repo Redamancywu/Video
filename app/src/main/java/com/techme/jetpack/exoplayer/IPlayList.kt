@@ -6,7 +6,7 @@ interface IPlayList {
     /**
      * 获取当前视频播放器的exoPlayer（TextureView）是否已被挂在到某个item的容器上
      */
-    val attachedView: ViewGroup?
+    val attachedView: WrapperPlayer?
 
     // 是否正在播放
     val isPlaying: Boolean

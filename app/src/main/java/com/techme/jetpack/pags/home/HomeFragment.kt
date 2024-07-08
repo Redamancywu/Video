@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -21,10 +22,21 @@ class HomeFragment : AbsListFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
+            viewModel.setFeedType(getFeedType())
             viewModel.hotFeeds.collect{
                 // 更新列表数据
                 submitData(it)
             }
+        }
+    }
+
+    companion object {
+        fun newInstance(feedType:String?): Fragment {
+            val args=Bundle()
+            args.putString("feedType",feedType)
+            val fragment=HomeFragment()
+            fragment.arguments=args
+            return fragment
         }
     }
 }

@@ -47,7 +47,7 @@ open class AbsListFragment : Fragment(R.layout.layout_abs_list_fragment) {
             )
         )
         // 创建适配器
-        feedAdapter = FeedAdapter(getFeedType(),lifecycleOwner =viewLifecycleOwner)
+        feedAdapter = FeedAdapter(getFeedType(), lifecycleOwner = viewLifecycleOwner)
         // 添加加载状态footer
         val contactAdapter = feedAdapter.withLoadStateFooter(FooterLoadStateAdapter())
         // 设置适配器
@@ -84,8 +84,9 @@ open class AbsListFragment : Fragment(R.layout.layout_abs_list_fragment) {
     override fun onDestroyView() {
         super.onDestroyView()
     }
-    fun getFeedType():String{
-        return "all"
+
+    fun getFeedType(): String {
+        return arguments?.getString("feedType") ?: "all"
     }
 
     fun submitData(pagingData: PagingData<Feed>) {
