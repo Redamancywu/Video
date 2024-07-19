@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F8F8"
+    tools:context="com.techme.jetpack.login.ui.LoginActivity">
+    <ImageView
+        android:id="@+id/action_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp_16"
+        android:layout_marginTop="@dimen/dp_30"
+        android:padding="@dimen/dp_10"
+        android:src="@drawable/icon_close"
+        tools:ignore="MissingConstraints" />
+
+        <LinearLayout
+            android:layout_marginTop="200dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/login_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:text="Login"
+                android:textColor="#000"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/login_with_google"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:backgroundTint="#42DFF4"
+                android:drawableStart="@drawable/google"
+                android:drawablePadding="8dp"
+                android:text="LOGIN WITH GOOGLE"
+                android:textAllCaps="false"
+                android:textColor="#FFF" />
+            <Button
+                android:id="@+id/login_with_qq"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:backgroundTint="#42DFF4"
+                android:drawablePadding="8dp"
+                android:text="LOGIN WITH QQ"
+                android:textAllCaps="false"
+                android:textColor="#FFF" />
+
+
+            <Button
+                android:id="@+id/login_with_facebook"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:backgroundTint="#1877F2"
+                android:drawableStart="@drawable/facebook"
+                android:drawablePadding="8dp"
+                android:text="LOGIN WITH FACEBOOK"
+                android:textAllCaps="false"
+                android:textColor="#FFF" />
+
+            <Button
+                android:id="@+id/login_with_twitter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:backgroundTint="#1D6BF2"
+                android:drawableStart="@drawable/twitter"
+                android:drawablePadding="8dp"
+                android:text="LOGIN WITH TWITTER"
+                android:textAllCaps="false"
+                android:textColor="#FFF" />
+
+            <Button
+                android:id="@+id/login_with_line"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:backgroundTint="#3A00C3"
+                android:drawableStart="@drawable/line"
+                android:drawablePadding="8dp"
+                android:text="LOGIN WITH LINE"
+                android:textAllCaps="false"
+                android:textColor="#FFF" />
+
+            <Button
+                android:id="@+id/login_as_visitor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="#B0B0B0"
+                android:drawableStart="@drawable/visitor"
+                android:drawablePadding="8dp"
+                android:text="LOGIN AS A VISITOR"
+                android:textAllCaps="false"
+                android:textColor="#FFF" />
+
+            <TextView
+                android:id="@+id/login_with_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Login with your email account"
+                android:textColor="#888"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

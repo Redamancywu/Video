@@ -10,6 +10,7 @@ import androidx.paging.PagingState
 import androidx.paging.cachedIn
 import com.techme.jetpack.http.ApiResult
 import com.techme.jetpack.http.ApiService
+import com.techme.jetpack.login.ui.UserManager
 
 class HomeViewModel : ViewModel() {
     val hotFeeds = Pager(
@@ -46,7 +47,14 @@ class HomeViewModel : ViewModel() {
                  * 总之，这段代码的作用是从某个服务（ApiService）获取数据，并在发生错误时进行处理。
                  */
                 ApiService.getService()
-                    .getFeeds(feedId = params.key ?: 0L, feedType = feedType)  //0L是为第一页数据也就是初始数据
+                    .getFeeds(
+                        feedId = params.key ?: 0L,
+                        feedType = feedType,
+                        userId = UserManager.userId()
+                    )  //0L是为第一页数据也就是初始数据
+            }
+            if(result.isFailure){
+                result.exceptionOrNull()?.printStackTrace()
             }
             val apiResult = result.getOrDefault(ApiResult())
             if (apiResult.success && apiResult.body?.isNotEmpty() == true) {

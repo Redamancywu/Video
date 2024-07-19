@@ -20,7 +20,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         NavGraphBuilder.build(navController, this, R.id.fragment_container)
-
         val appBottomBar = findViewById<AppBottomBar>(R.id.app_bottom_bar)
         appBottomBar.setOnItemSelectedListener {
             val tab = getBottomBarConfig(this).tabs[it.order]

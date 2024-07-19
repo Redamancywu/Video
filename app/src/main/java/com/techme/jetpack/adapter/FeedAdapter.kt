@@ -13,6 +13,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.DiffUtil
@@ -23,8 +24,11 @@ import com.techme.jetpack.ext.load
 import com.techme.jetpack.ext.setImageResource
 import com.techme.jetpack.ext.setImageUrl
 import com.techme.jetpack.ext.setMaterialButton
+import com.techme.jetpack.ext.setTextColor
 import com.techme.jetpack.ext.setTextVisibility
 import com.techme.jetpack.ext.setVisibility
+import com.techme.jetpack.http.ApiService
+import com.techme.jetpack.login.ui.UserManager
 import com.techme.jetpack.model.Author
 import com.techme.jetpack.model.TYPE_IMAGE_TEXT
 import com.techme.jetpack.model.TYPE_TEXT
@@ -39,6 +43,7 @@ import com.techme.jetpack_android_online.databinding.LayoutFeedLabelBinding
 import com.techme.jetpack_android_online.databinding.LayoutFeedTextBinding
 import com.techme.jetpack_android_online.databinding.LayoutFeedTopCommentBinding
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -164,20 +169,43 @@ class FeedAdapter(private val pageName: String, private val lifecycleOwner: Life
                 // 显示评论内容
                 commentBinding.commentText.setTextVisibility(commentText.toString())
                 // 显示点赞数
-                commentBinding.commentLikeCount.setTextVisibility(commentText.toString())
+                commentBinding.commentLikeCount.setTextVisibility(this.getUgcOrDefault().commentCount.toString())
                 // 显示预览视频播放按钮
                 commentBinding.commentPreviewVideoPlay.setVisibility(videoUrl != null)
                 //显示点赞数颜色
                 commentBinding.commentLikeStatus.setImageResource(
-                    topComment.hasLiked,
+                    this.getUgcOrDefault().hasLiked,
                     R.drawable.icon_cell_liked,
                     R.drawable.icon_cell_like
                 )
+                commentBinding.commentLikeCount.setTextColor(
+                    this.getUgcOrDefault().hasLiked,
+                    R.color.color_theme,
+                    R.color.color_3d3
+                )
+            }
+            commentBinding.commentLikeStatus.setOnClickListener {
+                lifecycleOwner.lifecycleScope.launch {
+                    UserManager.loginIfNeed()
+                    UserManager.getUser().collectLatest {
+                        val apiResult = ApiService.getService()
+                            .toggleCommentLike(topComment!!.commentId, itemId, it.userId)
+                        apiResult.body?.run {
+                            val topComment = snapshot().items[layoutPosition].topComment!!
+                            val ugc = topComment.getUgcOrDefault()
+                            ugc.hasLiked = this.getAsJsonPrimitive("hasLiked").asBoolean
+                            ugc.likeCount = this.getAsJsonPrimitive("likeCount").asInt
+                            notifyItemChanged(layoutPosition, topComment)
+                        }
+                    }
+                }
+            }
+            commentBinding.commentLikeCount.setOnClickListener {
 
             }
         }
 
-        fun bindInteraction(ugc: Ugc?) {
+        fun bindInteraction(ugc: Ugc?, itemId: Long) {
             ugc?.let {
                 val context = itemView.context
                 // 设置点赞的值
@@ -209,6 +237,30 @@ class FeedAdapter(private val pageName: String, private val lifecycleOwner: Life
                 interactionBinding.interactionDiss.iconTint = dissStateColor
                 interactionBinding.interactionDiss.setTextColor(dissStateColor)
 
+            }
+            interactionBinding.interactionLike.setOnClickListener {
+                toggleFeedLike(itemId, true)
+            }
+            interactionBinding.interactionDiss.setOnClickListener {
+                toggleFeedLike(itemId, false)
+            }
+        }
+
+        private fun toggleFeedLike(itemId: Long, like: Boolean) {
+            lifecycleOwner.lifecycleScope.launch {
+                UserManager.loginIfNeed()
+                UserManager.getUser().collectLatest {
+                    val apiResult = if (like) ApiService.getService()
+                        .toggleFeedLike(itemId, it.userId) else ApiService.getService()
+                        .toggleDissFeed(itemId, it.userId)
+                    apiResult.body?.run {
+                        val ugc = snapshot().items[layoutPosition].getUgcOrDefault()
+                        ugc.hasLiked = this.getAsJsonPrimitive("hasLiked").asBoolean
+                        ugc.hasdiss = this.getAsJsonPrimitive("hasdiss").asBoolean
+                        ugc.likeCount = this.getAsJsonPrimitive("likeCount").asInt
+                        notifyItemChanged(layoutPosition, ugc)
+                    }
+                }
             }
         }
 
@@ -249,6 +301,25 @@ class FeedAdapter(private val pageName: String, private val lifecycleOwner: Life
 
     }
 
+    override fun onBindViewHolder(
+        holder: FeedViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        if (payloads.isEmpty()) {
+
+            super.onBindViewHolder(holder, position, payloads)
+            return
+        }
+        if (payloads[0] is Ugc) {
+            holder.bindInteraction(payloads[0] as Ugc, getItem(position)!!.itemId)
+
+        } else if (payloads[0] is TopComment) {
+            holder.bindFeedComment(payloads[0] as TopComment)
+        }
+
+    }
+
     override fun onViewDetachedFromWindow(holder: FeedViewHolder) {
         super.onViewDetachedFromWindow(holder)
         playDetector.removeDetectorListener(holder)
@@ -273,7 +344,7 @@ class FeedAdapter(private val pageName: String, private val lifecycleOwner: Life
         }
         holder.bindFeedLabel(feed.activityText)
         holder.bindFeedComment(feed.topComment)
-        holder.bindInteraction(feed.ugc)
+        holder.bindInteraction(feed.getUgcOrDefault(), feed.itemId)
 
     }
 

@@ -2,6 +2,8 @@ package com.techme.jetpack.http
 
 import com.techme.jetpack.model.Feed
 import com.google.gson.JsonObject
+import com.techme.jetpack.model.Author
+import com.techme.jetpack.model.TopComment
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -31,13 +33,13 @@ interface IApiInterface {
      * @param qq0penId qq登录后获得，代表用户的唯一身份
      * @param expires_time 登录过期时间
      */
-//    @GET("user/insert")
-//    suspend fun saveUser(
-//        @Query("name") name: String,
-//        @Query("avatar") avatar: String,
-//        @Query("qqOpenId") qq0penId: String,
-//        @Query("expires_time") expires_time: Long
-//    ): ApiResult<Author>
+    @GET("user/insert")
+    suspend fun saveUser(
+        @Query("name") name: String,
+        @Query("avatar") avatar: String,
+        @Query("qqOpenId") qq0penId: String,
+        @Query("expires_time") expires_time: Long
+    ): ApiResult<Author>
 
 
     /**
@@ -112,27 +114,27 @@ interface IApiInterface {
     /**
      * 查询帖子的评论
      */
-//    @GET("comment/queryFeedComments")
-//    suspend fun getFeedCommentList(
-//        @Query("userId") userId: Long,
-//        @Query("itemId") itemId: Long,
-//        @Query("commentId") commentId: Long = 0
-//    ): ApiResult<List<TopComment>>
+    @GET("comment/queryFeedComments")
+    suspend fun getFeedCommentList(
+        @Query("userId") userId: Long,
+        @Query("itemId") itemId: Long,
+        @Query("commentId") commentId: Long = 0
+    ): ApiResult<List<TopComment>>
 
     /**
      * 发布一条评论,  其中videoUrl、imageUrl非必填
      */
-//    @POST("comment/addComment")
-//    @FormUrlEncoded
-//    suspend fun addComment(
-//        @Field("userId") userId: Long,
-//        @Field("itemId") itemId: Long,
-//        @Field("commentText") commentText: String,
-//        @Field("video_url") videoUrl: String? = null,
-//        @Field("image_url") imageUrl: String? = null,
-//        @Field("width") width: Int = 0,
-//        @Field("height") height: Int = 0
-//    ): ApiResult<TopComment>
+    @POST("comment/addComment")
+    @FormUrlEncoded
+    suspend fun addComment(
+        @Field("userId") userId: Long,
+        @Field("itemId") itemId: Long,
+        @Field("commentText") commentText: String,
+        @Field("video_url") videoUrl: String? = null,
+        @Field("image_url") imageUrl: String? = null,
+        @Field("width") width: Int = 0,
+        @Field("height") height: Int = 0
+    ): ApiResult<TopComment>
 
 
     /**
